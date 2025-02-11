@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Valentine's Proposal Game</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+    <style>
+        body {
+            background: linear-gradient(135deg, #ff69b4, #ff1493);
+            font-family: Arial, sans-serif;
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .name-entry {
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+            margin-bottom: 20px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+            z-index: 100;
+        }
+
+        .name-entry input {
+            padding: 10px;
+            font-size: 16px;
+            border: 2px solid #ff69b4;
+            border-radius: 5px;
+            margin: 10px;
+        }
+
+        .name-entry button {
+            padding: 10px 20px;
+            background: #ff1493;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        .game-container {
+            display: none;
+            grid-template-columns: repeat(6, 100px);
+            gap: 10px;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 15px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .tile {
+            width: 100px;
+            height: 100px;
+            border: 2px solid #ff69b4;
+            border-radius: 10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 24px;
+            position: relative;
+            background: white;
+        }
+
+        .player {
+            width: 40px;
+            height: 40px;
+            position: absolute;
+            transition: all 0.5s ease;
+            z-index: 2;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .player img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        .dice-container {
+            display: none;
+            margin: 20px;
+        }
+
+        .dice {
+            width: 100px;
+            height: 100px;
+            background: white;
+            border-radius: 10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 36px;
+            cursor: pointer;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .pokemon-card {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 300px;
+            background: linear-gradient(135deg, #ffd700, #ff8c00);
+            border-radius: 15px;
+            padding: 20px;
+            text-align: center;
+            box-shadow:
+                0 0 20px rgba(0, 0, 0, 0.3),
+                inset 0 0 50px rgba(255, 255, 255, 0.3);
+            z-index: 100;
+            animation: shiny 2s infinite;
+            border: 8px solid #fff;
+            overflow: hidden;
+        }
+
+        .pokemon-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 50%;
+            height: 100%;
+            background: linear-gradient(90deg,
+                    transparent,
+                    rgba(255, 255, 255, 0.4),
+                    transparent);
+            animation: shine 1.5s infinite;
+            transform: skewX(-25deg);
+        }
+
+        .pokemon-card img {
+            width: 220px;
+            height: 220px;
+            object-fit: contain;
+            border-radius: 10px;
+            margin: 10px auto;
+            background: radial-gradient(circle at center, #ffffff, #f0f0f0);
+            padding: 15px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+            border: 4px solid #ffd700;
+        }
+
+        .pokemon-card h2 {
+            color: #fff;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+            font-size: 24px;
+            margin-top: 15px;
+            background: linear-gradient(45deg, #ff4500, #ff8c00);
+            padding: 10px;
+            border-radius: 8px;
+            border: 2px solid #fff;
+        }
+
+        @keyframes shine {
+            0% {
+                left: -100%;
+            }
+
+            20% {
+                left: 100%;
+            }
+
+            100% {
+                left: 100%;
+            }
+        }
+
+        @keyframes shiny {
+            0% {
+                background: linear-gradient(135deg, #ffd700, #ff8c00);
+            }
+
+            50% {
+                background: linear-gradient(135deg, #ff8c00, #ffd700);
+            }
+
+            100% {
+                background: linear-gradient(135deg, #ffd700, #ff8c00);
+            }
+        }
+
+        /* Add this if you want a holographic effect */
+        .pokemon-card::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(125deg,
+                    rgba(255, 255, 255, 0) 0%,
+                    rgba(255, 255, 255, 0.1) 30%,
+                    rgba(255, 255, 255, 0.2) 40%,
+                    rgba(255, 255, 255, 0.3) 50%,
+                    rgba(255, 255, 255, 0.2) 60%,
+                    rgba(255, 255, 255, 0.1) 70%,
+                    rgba(255, 255, 255, 0) 100%);
+            mix-blend-mode: overlay;
+            pointer-events: none;
+        }
+
+
+        .final-card {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 400px;
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            text-align: center;
+            z-index: 100;
+        }
+
+        .button-container {
+            position: relative;
+            height: 100px;
+            width: 100%;
+        }
+
+        .btn {
+            padding: 10px 30px;
+            margin: 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 18px;
+        }
+
+        .btn-yes {
+            background: #4CAF50;
+            color: white;
+        }
+
+        .btn-no {
+            background: #f44336;
+            color: white;
+            position: absolute;
+            transition: all 0.3s ease;
+            user-select: none;
+        }
+
+        .dice-rolling {
+            animation: rolling 0.5s infinite;
+        }
+
+        .player-info {
+            background: white;
+            padding: 10px 20px;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            display: none;
+            font-size: 18px;
+            font-weight: bold;
+            color: #ff1493;
+        }
+
+        @keyframes rolling {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        @keyframes poof {
+            0% {
+                transform: scale(1);
+                opacity: 1;
+            }
+
+            50% {
+                transform: scale(1.5);
+                opacity: 0.5;
+            }
+
+            100% {
+                transform: scale(0);
+                opacity: 0;
+            }
+        }
+
+        .poof-effect {
+            animation: poof 0.5s ease-out forwards;
+        }
+
+        .poof-emoji {
+            position: absolute;
+            font-size: 40px;
+            pointer-events: none;
+            animation: poof 1s ease-out forwards;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="name-entry" id="nameEntry">
+        <h2>Enter Your Name to Start</h2>
+        <input type="text" id="playerName" placeholder="Your Name">
+        <button onclick="startGame()">Start Game</button>
+    </div>
+
+    <div class="player-info" id="playerInfo"></div>
+
+    <div class="game-container" id="gameBoard"></div>
+
+    <div class="dice-container" id="diceContainer">
+        <div class="dice" id="dice" onclick="rollDice()">🎲</div>
+    </div>
+
+    <div class="pokemon-card" id="eventCard">
+        <img id="eventImage" src="" alt="Event Image">
+        <h2 id="eventText"></h2>
+    </div>
+
+    <div class="final-card" id="finalCard">
+        <h1>Will you be my Valentine? ❤️</h1>
+        <div class="button-container">
+            <button class="btn btn-yes" onclick="acceptProposal()">Yes</button>
+            <button class="btn btn-no" id="noBtn" onclick="poofButton(this)">No</button>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.4.0/dist/confetti.browser.min.js"></script>
+    <script>
+        let currentPosition = 1;
+        let playerName = '';
+        const specialTiles = {
+            4: { text: "It's our anniversary!", image: "/home/ataraxia/Downloads/4.jpg" },
+            5: { text: "look at your big gworlie graduation!", image: "/home/ataraxia/Downloads/5.jpg" },
+            10: { text: "chota don!", image: "/home/ataraxia/Downloads/10.jpg" },
+            17: { text: "It's your birthday!", image: "/home/ataraxia/Downloads/17.jpg" },
+            18: { text: "It's my birthday!", image: "/home/ataraxia/Downloads/18.jpg" },
+            21: { text: "First date!", image: "/home/ataraxia/Downloads/21.jpg" },
+            23: { text: "girls after throwing maggie", image: "/home/ataraxia/Downloads/23.jpg" },
+            26: { text: "diggin pizza be dizzing!", image: "/home/ataraxia/Downloads/26.jpg" }
+        };
+
+        function startGame() {
+            playerName = document.getElementById('playerName').value.trim();
+            if (!playerName) {
+                alert('Please enter your name!');
+                return;
+            }
+
+            document.getElementById('nameEntry').style.display = 'none';
+            document.getElementById('gameBoard').style.display = 'grid';
+            document.getElementById('diceContainer').style.display = 'block';
+            document.getElementById('playerInfo').style.display = 'block';
+            document.getElementById('playerInfo').textContent = `Player: ${playerName}`;
+
+            // Generate game board
+            const gameBoard = document.getElementById('gameBoard');
+            for (let i = 1; i <= 30; i++) {
+                const tile = document.createElement('div');
+                tile.className = 'tile';
+                tile.textContent = i;
+                gameBoard.appendChild(tile);
+            }
+
+            // Add player
+            const player = document.createElement('div');
+            player.className = 'player';
+            player.innerHTML = `
+                <img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/25.png" alt="Player">
+            `;
+            document.querySelector('.tile').appendChild(player);
+        }
+
+        function rollDice() {
+            const dice = document.getElementById('dice');
+            dice.classList.add('dice-rolling');
+
+            setTimeout(() => {
+                const roll = Math.floor(Math.random() * 6) + 1;
+                dice.textContent = roll;
+                dice.classList.remove('dice-rolling');
+                movePlayer(roll);
+            }, 1000);
+        }
+
+        function movePlayer(spaces) {
+            const newPosition = Math.min(currentPosition + spaces, 30);
+            let currentStep = currentPosition;
+
+            const moveInterval = setInterval(() => {
+                if (currentStep < newPosition) {
+                    currentStep++;
+                    const currentTile = document.querySelectorAll('.tile')[currentStep - 1];
+                    const player = document.querySelector('.player');
+                    player.remove();
+                    currentTile.appendChild(player);
+                } else {
+                    clearInterval(moveInterval);
+                    currentPosition = newPosition;
+
+                    if (specialTiles[currentPosition]) {
+                        showEventCard(currentPosition);
+                    }
+
+                    if (currentPosition === 30) {
+                        setTimeout(showFinalCard, 1000);
+                    }
+                }
+            }, 300);
+        }
+
+        function showEventCard(position) {
+            const card = document.getElementById('eventCard');
+            const image = document.getElementById('eventImage');
+            const text = document.getElementById('eventText');
+
+            image.src = specialTiles[position].image;
+            text.textContent = specialTiles[position].text;
+            card.style.display = 'block';
+
+            setTimeout(() => {
+                card.style.display = 'none';
+            }, 3000);
+        }
+
+        function showFinalCard() {
+            document.getElementById('finalCard').style.display = 'block';
+        }
+
+        // No button bounce and poof logic
+        const noBtn = document.getElementById('noBtn');
+        let velocityX = 5;
+        let velocityY = 5;
+        let posX = 0;
+        let posY = 0;
+
+        noBtn.addEventListener('mouseover', startBouncing);
+
+        function startBouncing() {
+            if (!noBtn.isAnimating && document.contains(noBtn)) {
+                noBtn.isAnimating = true;
+                animateButton();
+            }
+        }
+
+        function poofButton(button) {
+            // Create poof emojis
+            const poofEmojis = ['💨', '✨', '💫', '🌟'];
+            for (let i = 0; i < 4; i++) {
+                const poof = document.createElement('span');
+                poof.className = 'poof-emoji';
+                poof.textContent = poofEmojis[i];
+                poof.style.left = `${Math.random() * 100}%`;
+                poof.style.top = `${Math.random() * 100}%`;
+                button.parentElement.appendChild(poof);
+            }
+
+            // Add poof effect to button
+            button.classList.add('poof-effect');
+
+            // Remove button after animation
+            setTimeout(() => {
+                button.remove();
+            }, 500);
+
+            // Remove poof emojis after animation
+            setTimeout(() => {
+                const poofs = document.querySelectorAll('.poof-emoji');
+                poofs.forEach(p => p.remove());
+            }, 1000);
+        }
+
+        function acceptProposal() {
+            document.getElementById('finalCard').innerHTML = `
+                <img src="/home/ataraxia/Downloads/us.jpg" alt="Us Together" style="width: 100%; border-radius: 10px;">
+                <h1>Thank you for saying Yes, ${playerName}! ❤️</h1>
+            `;
+
+            setInterval(() => {
+                confetti({
+                    particleCount: 100,
+                    spread: 70,
+                    origin: { y: 0.6 }
+                });
+            }, 1000);
+        }
+    </script>
+</body>
+
+</html>
